@@ -1,0 +1,21 @@
+# Data (teammates obtain from course)
+Orders.csv
+Payment_History.csv
+
+# Generated / logs
+*.log
+roc_curve_*.png
+_run_*.py
+_*.json
+
+# Auto-generated scripts
+model_experiments_run.py
+best_model_pipeline_run.py
+
+# Unrelated demo
+agent-demo-churn-default.ipynb
+
+# IDE
+.cursor/
+__pycache__/
+*.pyc
