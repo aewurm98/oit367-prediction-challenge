@@ -37,3 +37,19 @@ Place the following files in the project root (obtain from course materials):
 - **Submission:** `submission_v4.csv`
 
 See `RESULTS.md` and `EXPERIMENTS.md` for details.
+
+---
+
+## Sharing with Teammates (GitHub)
+
+1. Create a **private** repository on GitHub (e.g. `oit367-payjoy-prediction`).
+2. Add teammates as collaborators (Settings → Collaborators).
+3. Push this repo:
+
+```bash
+git remote add origin https://github.com/YOUR_USERNAME/oit367-payjoy-prediction.git
+git branch -M main
+git push -u origin main
+```
+
+Teammates clone the repo and place `Orders.csv` and `Payment_History.csv` in the project folder (from course download).
