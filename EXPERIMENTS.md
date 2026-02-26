@@ -18,8 +18,9 @@ Update the scorecard and experiment log after every run.
 | 007 | v2 + KYC interactions (kyc_min_score, perfect_kyc_flag) | 0.5563 | +0.0007 | 2025-02-23 |
 | 008 | v2 + geographic cross (user_merchant_same_state) | 0.5561 | +0.0005 | 2025-02-23 |
 | **009** | **v2 + ALL new feature groups (A+B+C+D combined)** | **0.5574** | **+0.0018** | **2025-02-23** |
+| **010** | **v5 Cowork (LightGBM+RF, 118 features, expanding window)** | **0.63171** | **+0.0656** | **2026-02-25** |
 
-**Current best: EXP-009 — Nov AUC 0.5574 (not yet submitted)**
+**Current best: EXP-010 — Nov AUC 0.63171**
 
 **Kaggle competition slug:** `predicting-fraud-in-phone-financing`
 
@@ -428,6 +429,42 @@ of ~40 minutes.
 
 ---
 
+### EXP-005 — v5 Feature Architecture Evaluation (2026-02-25)
+
+- **Goal:** Quantify the AUC contribution of each new feature group in the Cowork rebuild, using the fixed Jan-Oct → Nov temporal holdout.
+- **Method:** Sequential addition of feature groups (steps A→L), each evaluated with a fast LightGBM (200 trees, lr=0.1, 31 leaves) on the Jan-Oct training set validated on November.
+- **Feature group results:**
+
+| Step | Group | # Features | Nov AUC | Delta |
+|------|-------|------------|---------|-------|
+| A | KYC original | 4 | 0.52368 | baseline |
+| B | + KYC transforms (deficit/min/missing) | 15 | 0.52216 | -0.00152 |
+| C | + financial ratios + temporal + geo | 34 | 0.59997 | +0.07781 |
+| D | + merchant dormancy | 37 | 0.59997 | +0.00000 |
+| E | + all entity FPD rates | 40 | 0.61317 | +0.01320 |
+| F | + excess/weighted risk/new flags | 48 | 0.61426 | +0.00109 |
+| G | + temporal trend features | 54 | 0.61270 | -0.00155 |
+| H | + order size anomaly vs merchant | 56 | 0.61349 | +0.00078 |
+| I | + interaction variables | 65 | 0.61385 | +0.00037 |
+| J | + pmt FPD proxy + zero recovery | 77 | 0.62723 | +0.01338 |
+| K | + all payment history features | 101 | 0.62388 | -0.00335 |
+| L | + raw financials + full temporal | 118 | 0.62941 | +0.00553 |
+
+- **Final CV AUC (3-fold temporal):** 0.63898 ± 0.00668
+- **Fold 3 (Jan-Oct → Nov) AUC:** 0.63171
+- **Key findings:** Financial/temporal/geo (step C) added +0.078 — largest single jump. Entity rates (E) +0.013, payment proxy (J) +0.013. Dormancy (D) added nothing. Full payment features (K) slightly worse than J.
+- **Decisions:** Dormancy droppable. Consider PMT_CORE instead of full PMT_FEATS_RICH. RF blend (70/30) used; within 0.02 of LGB.
+
+---
+
+### EXP-006 — Hyperparameter Tuning on v5 Feature Set (TBD)
+
+- **Goal:** Tune `num_leaves` and `min_child_samples` for the v5 feature set.
+- **Configuration grid:** num_leaves ∈ [31, 63, 127], min_child_samples ∈ [30, 50, 100]
+- **Method:** Jan-Oct → Nov holdout. Status: not yet run.
+
+---
+
 ### EXP-NNN: (template)
 
 - **Date:**
@@ -436,3 +473,95 @@ of ~40 minutes.
 - **Nov holdout AUC:**
 - **Compared to previous best:**
 - **Notes / next steps:**
+
+---
+
+## v6 Infrastructure (2026-02-26)
+
+v6 improvement framework implemented per action plan. Target: ~0.62 AUC (from 0.60086).
+
+### Scripts
+
+| Script | Purpose |
+|--------|---------|
+| `_run_v6_diagnostics.py` | Per-feature temporal AUC, permutation importance, error analysis |
+| `_run_v6_experiments.py` | Config sweep: pruning, LOCK_NAME/CURRENCY, HP grid, ensemble weights |
+
+### v5 Configurable Flags (env vars)
+
+| Env var | Default | Effect |
+|---------|---------|--------|
+| `V5_USE_DORMANCY` | 1 | Include dormancy features (D) |
+| `V5_USE_TREND` | 1 | Include temporal trend features (G) |
+| `V5_USE_PMT_RICH` | 1 | Use PMT_FEATS_RICH; 0 = PMT_CORE only |
+| `V5_USE_LOCK_NAME` | 0 | Add LOCK_NAME_fpd_rate |
+| `V5_USE_CURRENCY` | 0 | Add CURRENCY_fpd_rate |
+| `V5_DIAGNOSTICS` | 0 | Save pipeline to pickle and exit (for v6) |
+
+### v6 Experiment Configs
+
+1. **baseline_v5** — Full v5 feature set
+2. **no_dormancy** — Drop D
+3. **no_trend** — Drop G (keep clerk_excess_risk)
+4. **pmt_core** — PMT_CORE instead of PMT_FEATS_RICH
+5. **no_dorm_no_trend** — Drop D + G
+6. **prune_all_pmt_core** — Drop D + G + PMT_CORE
+7. **+lock_name** — Pruned + LOCK_NAME_fpd_rate
+8. **+lock_currency** — Pruned + LOCK_NAME + CURRENCY_fpd_rate
+9. **hp_31_30**, **hp_31_100**, **hp_127_50** — num_leaves × min_child_samples
+10. **lgb80_rf20**, **lgb90_rf10**, **lgb_only** — Ensemble weight sweep
+
+### v6 Results (to be filled after run)
+
+Run `python _run_v6_experiments.py` and record best config in scorecard.
+
+---
+
+## Post-v5 Next Steps
+
+Read the Section 7 AUC table from `run_v5.log` before choosing a path.
+
+### How to read the Section 7 table
+
+After running `_run_v5_cowork.py`, the log prints a cumulative AUC table (steps A→L).
+Use these thresholds to decide what to keep:
+
+| Delta vs. previous step | Action |
+|---|---|
+| > +0.010 | Critical — never drop |
+| +0.003 – 0.010 | Meaningful — keep |
+| +0.001 – 0.003 | Minor — keep unless causing overfit |
+| < +0.001 | Likely noise — consider dropping |
+
+**Key diagnostic: compare step J vs. step I** — J adds pmt_fpd_proxy_rate and zero_recovery_rate. If J > I by > +0.001, payment history adds independent signal. If J ≈ I, entity FPD rates already captured the same signal.
+
+### Tier 1 — Try regardless of current AUC
+
+- **T1-A:** Prune low-signal features — drop groups where Section 7 delta < +0.001 (DORMANCY, MEDIAN, or replace PMT_FEATS_RICH with PMT_CORE if step K ≈ step J).
+- **T1-B:** Tune num_leaves and min_child_samples — grid [31,63,127] × [30,50,100] on Jan-Oct → Nov holdout.
+- **T1-C:** Lower learning rate + more rounds if best_iter near 3000 cap.
+
+### Tier 2 — Try if still below 0.61 after Tier 1
+
+- **T2-A:** Country-level stratified models if one country > 60% of test set.
+- **T2-B:** Payment history portfolio trend (recent vs overall merchant payment behavior).
+- **T2-C:** Stricter expanding window for payment history (no future-month leakage).
+- **T2-D:** Smoothing parameter k sensitivity — test k ∈ {5, 10, 20}.
+
+### Tier 3 — Experimental
+
+- **T3-A:** XGBoost ensemble blend.
+- **T3-B:** Permutation importance-based feature pruning.
+- **T3-C:** Platt scaling for probability calibration.
+
+### Decision matrix (quick reference)
+
+| Feature group | Keep if | Drop if |
+|---|---|---|
+| Entity FPD rates | Always | Never |
+| ADMINID/STATE/CITY rates | Step F adds > +0.001 | Near-zero delta |
+| MODEL/MANUFACTURER/LOCK_PRODUCT | Step G adds > +0.001 | Near-zero delta |
+| KYC transforms | Step B adds > +0.001 | Raw KYC ≈ transforms |
+| PMT core | Step J adds > +0.001 | J ≈ I |
+| Full payment features | Step K > step J by +0.001 | K ≈ J |
+| Dormancy + order size anomaly | Feature importance > 50 | Near zero |

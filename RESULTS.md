@@ -164,3 +164,30 @@ comparable across countries resolved a cross-market confound. The combined
 v3 model achieves the best Nov AUC to date. Importantly, EXP-003 and EXP-004
 proved that feature pruning and HP tuning cannot break past ~0.556, so the
 improvement here represents genuine new information, not better optimization.
+
+---
+
+## v5 — Cowork Rebuild (2026-02-25)
+
+**Description:** Full feature rebuild with expanding-window entity FPD rates,
+Bayesian smoothing k=10, 8 entity types, KYC deficit transforms, payment
+history features, and LightGBM temporal CV.
+
+**Features:** 118 (KYC, financial ratios, temporal, entity FPD rates, excess/weighted,
+trend, order size anomaly, interactions, payment history aggregates)
+
+**LightGBM hyperparameters:** learning_rate=0.03, num_leaves=63, min_child_samples=50,
+feature_fraction=0.8, bagging_fraction=0.8, bagging_freq=5, reg_alpha=0.1, reg_lambda=0.1
+
+**Results:**
+
+| Metric | Value |
+|---|---|
+| CV AUC (3-fold temporal) | 0.63898 ± 0.00668 |
+| November held-out AUC (Fold 3) | 0.63171 |
+| RF blend used | True (70/30 LGB/RF) |
+| Submission mean pred | 0.44323 |
+
+**Submission file:** `submission_v5.csv`
+
+**Run:** `python _run_v5_cowork.py`

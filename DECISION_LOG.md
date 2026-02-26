@@ -435,3 +435,22 @@ with feature engineering upgrades.
 
 **Status:** All code implemented in `model_experiments.ipynb`. Awaiting execution
 to obtain results. `update-pipeline` and `update-docs` deferred until results.
+
+---
+
+## 2026-02-25 — v5 Cowork Rebuild
+
+**Decision:** Complete feature rebuild guided by first-principles fraud
+taxonomy (organized merchant rings, identity fraud, geographic clusters,
+opportunistic default, device arbitrage).
+
+**Root causes addressed:**
+1. Entity rate leakage: rates previously computed from all Jan-Nov.
+   Fix: expanding window — month M uses only months 1 to M-1.
+2. Over-smoothing (k=50): Fix: k=10.
+3. Payment history underutilized: Fix: early-default proxy, principal
+   recovery rate, loan longevity as fraud abandonment signal.
+4. No interaction variables: Fix: 9 interaction features.
+5. KYC signal misspecified: Fix: deficit transform (100 - score).
+
+**Status:** Implemented. Nov AUC 0.63171. See RESULTS.md v5. submission_v5.csv ready for Kaggle.

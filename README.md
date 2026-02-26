@@ -24,19 +24,23 @@ Place the following files in the project root (obtain from course materials):
 
 ## How to Run
 
-| Notebook | Purpose |
-|----------|---------|
-| `best_model_pipeline.ipynb` | Production pipeline — generates `submission.csv` for Kaggle |
+| Script / Notebook | Purpose |
+|-------------------|---------|
+| `_run_v5_cowork.py` | Primary pipeline — generates `submission_v5.csv` for Kaggle |
+| `_run_v6_diagnostics.py` | v6 diagnostics — per-feature temporal AUC, permutation importance |
+| `_run_v6_experiments.py` | v6 config sweep — pruning, LOCK_NAME/CURRENCY, HP, ensemble |
+| `best_model_pipeline.ipynb` | v4 NN pipeline — generates `submission.csv` |
 | `model_experiments.ipynb` | Experimentation — model comparison, hyperparameter tuning |
 
 ## Current Best
 
-**v4 NN** — FPDNet [128,64,32], lr=0.0005, v4 features (smoothed encoding, CITY, MODEL, days_to_first_due).
+**v5 Cowork** — LightGBM + RF ensemble (70/30), 118 features, expanding-window entity rates, payment history features.
 
-- **November AUC:** 0.5661
-- **Submission:** `submission_v4.csv`
+- **November AUC:** 0.63171
+- **Submission:** `submission_v5.csv`
+- **Run:** `python _run_v5_cowork.py`
 
-See `RESULTS.md` and `EXPERIMENTS.md` for details.
+See `RESULTS.md` and `EXPERIMENTS.md` for details. Legacy experiment scripts are in `archive/`.
 
 ---
 

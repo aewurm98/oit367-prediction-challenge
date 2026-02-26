@@ -7,6 +7,8 @@ Payment_History.csv
 roc_curve_*.png
 _run_*.py
 _*.json
+# Un-ignore legacy scripts in archive for reference
+!archive/_run_*.py
 
 # Auto-generated scripts
 model_experiments_run.py
