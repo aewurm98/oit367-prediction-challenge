@@ -1,0 +1,15 @@
+Error analysis (Nov holdout) — Calibration by predicted probability bin
+======================================================================
+  Bin  1: pred [0.000, 0.297)  n= 9,945  actual FPD rate=0.0378  mean pred=0.2433  calibration err=0.2055
+  Bin  2: pred [0.297, 0.350)  n= 9,944  actual FPD rate=0.0472  mean pred=0.3251  calibration err=0.2779
+  Bin  3: pred [0.350, 0.393)  n= 9,944  actual FPD rate=0.0615  mean pred=0.3721  calibration err=0.3106
+  Bin  4: pred [0.393, 0.430)  n= 9,944  actual FPD rate=0.0691  mean pred=0.4114  calibration err=0.3423
+  Bin  5: pred [0.430, 0.464)  n= 9,944  actual FPD rate=0.0806  mean pred=0.4468  calibration err=0.3663
+  Bin  6: pred [0.464, 0.499)  n= 9,944  actual FPD rate=0.0945  mean pred=0.4814  calibration err=0.3869
+  Bin  7: pred [0.499, 0.535)  n= 9,944  actual FPD rate=0.1006  mean pred=0.5167  calibration err=0.4161
+  Bin  8: pred [0.535, 0.574)  n= 9,944  actual FPD rate=0.1088  mean pred=0.5539  calibration err=0.4451
+  Bin  9: pred [0.574, 0.624)  n= 9,944  actual FPD rate=0.1260  mean pred=0.5971  calibration err=0.4711
+  Bin 10: pred [0.624, 1.000)  n= 9,945  actual FPD rate=0.1680  mean pred=0.6803  calibration err=0.5123
+
+Features with temporal AUC near 0.50 are temporal noise.
+Features with negative permutation importance may hurt the model.

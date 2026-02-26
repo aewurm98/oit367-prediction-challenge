@@ -191,3 +191,27 @@ feature_fraction=0.8, bagging_fraction=0.8, bagging_freq=5, reg_alpha=0.1, reg_l
 **Submission file:** `submission_v5.csv`
 
 **Run:** `python _run_v5_cowork.py`
+
+---
+
+## v6 — +lock_currency (2026-02-26)
+
+**Description:** v5 pipeline with v6 config: LOCK_NAME + CURRENCY FPD rates enabled,
+dormancy and PMT_CORE disabled (pruned base). Best config from v6 experiments.
+
+**Config:** V5_USE_LOCK_NAME=1, V5_USE_CURRENCY=1, V5_USE_DORMANCY=0, V5_USE_PMT_RICH=0
+
+**Features:** 95 (entity FPD rates including LOCK_NAME, CURRENCY; no dormancy, PMT_CORE)
+
+**Results:**
+
+| Metric | Value |
+|---|---|
+| CV AUC (3-fold temporal) | 0.63747 ± 0.00245 |
+| November held-out AUC (Fold 3) | 0.63408 |
+| RF blend used | True (70/30 LGB/RF) |
+| Top feature | LOCK_NAME_fpd_rate |
+
+**Submission file:** `submission_v6.csv`
+
+**Run:** `python _run_v6_cowork.py`

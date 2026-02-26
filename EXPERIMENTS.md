@@ -19,8 +19,9 @@ Update the scorecard and experiment log after every run.
 | 008 | v2 + geographic cross (user_merchant_same_state) | 0.5561 | +0.0005 | 2025-02-23 |
 | **009** | **v2 + ALL new feature groups (A+B+C+D combined)** | **0.5574** | **+0.0018** | **2025-02-23** |
 | **010** | **v5 Cowork (LightGBM+RF, 118 features, expanding window)** | **0.63171** | **+0.0656** | **2026-02-25** |
+| **011** | **v6 (+lock_currency, 95 features, LOCK_NAME+CURRENCY FPD rates)** | **0.63408** | **+0.00237** | **2026-02-26** |
 
-**Current best: EXP-010 — Nov AUC 0.63171**
+**Current best: EXP-011 — Nov AUC 0.63408**
 
 **Kaggle competition slug:** `predicting-fraud-in-phone-financing`
 
@@ -511,9 +512,17 @@ v6 improvement framework implemented per action plan. Target: ~0.62 AUC (from 0.
 9. **hp_31_30**, **hp_31_100**, **hp_127_50** — num_leaves × min_child_samples
 10. **lgb80_rf20**, **lgb90_rf10**, **lgb_only** — Ensemble weight sweep
 
-### v6 Results (to be filled after run)
+### v6 Results (2026-02-26)
 
-Run `python _run_v6_experiments.py` and record best config in scorecard.
+Best config: **+lock_currency** (Nov AUC 0.63343 in experiments; 0.63408 in full run with trend kept).
+
+| Config | Nov AUC | Feature count |
+|--------|---------|---------------|
+| +lock_currency | 0.63408 | 95 |
+| baseline_v5 | 0.63239 | 118 |
+| lgb_only | 0.63286 | 86 |
+
+Run `python _run_v6_cowork.py` to produce `submission_v6.csv`.
 
 ---
 
