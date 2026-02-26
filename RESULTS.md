@@ -215,3 +215,5 @@ dormancy and PMT_CORE disabled (pruned base). Best config from v6 experiments.
 **Submission file:** `submission_v6.csv`
 
 **Run:** `python _run_v6_cowork.py`
+
+**Audit note:** v6 underperformed v5 on Kaggle despite higher Nov AUC. Use v5 for submission. See V7_PROPOSAL.md for lessons learned.

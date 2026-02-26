@@ -8,11 +8,12 @@ Standalone proposal for teammates. See [EXPERIMENTS.md](EXPERIMENTS.md) for full
 
 | Metric | Value |
 |--------|-------|
-| November holdout AUC (v6) | ~0.63 |
-| Kaggle public AUC | ~0.60 |
-| Gap | ~0.03 |
+| November holdout AUC (v5) | 0.63171 |
+| November holdout AUC (v6) | 0.63408 |
+| Kaggle public AUC (v5) | Best of our submissions |
+| Kaggle public AUC (v6) | Worse than v5 |
 
-**Problem:** The model overfits to November. Patterns that score well on our Nov holdout do not generalize to December (Kaggle test set). Temporal shift between Nov and Dec is hurting leaderboard performance.
+**Problem:** v6 had higher Nov AUC but **underperformed v5 on Kaggle**. Optimizing for November hurts December generalization. Temporal shift between Nov and Dec is hurting leaderboard performance.
 
 **Root causes:**
 - Validation uses Nov as the primary metric; config selection optimizes for Nov, not for generalization.
@@ -62,15 +63,24 @@ Standalone proposal for teammates. See [EXPERIMENTS.md](EXPERIMENTS.md) for full
 
 ---
 
-## 5. Success Criteria
+## 5. Lessons from v6
 
-- **Mean 4-fold AUC** maintained or improved vs v6 (Nov AUC 0.63408).
-- **Kaggle public AUC** target: ~0.62 (closing the Nov–Kaggle gap).
+- **Nov AUC ≠ Kaggle AUC.** v6 was selected for highest Nov AUC; it generalized worse to December.
+- **LOCK_NAME/CURRENCY rates** may overfit to November product/market mix; December may differ.
+- **Pruning** (dropping dormancy, trend, PMT_RICH) reduced features but may have removed useful Dec signal.
+- **v7 must use validation that is less Nov-centric** — e.g., 4-fold forward CV with mean AUC across months.
+
+---
+
+## 6. Success Criteria
+
+- **Mean 4-fold AUC** maintained or improved vs v5 (Nov AUC 0.63171).
+- **Kaggle public AUC** target: ~0.62; must beat v5's Kaggle score.
 - **Stability:** Std of 4-fold AUC should be reasonable; high variance suggests unstable config.
 
 ---
 
-## 6. References
+## 7. References
 
 - [EXPERIMENTS.md](EXPERIMENTS.md) — Full experiment log, scorecard
 - [v6_experiments_results.csv](v6_experiments_results.csv) — v6 config sweep results

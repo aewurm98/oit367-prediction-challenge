@@ -21,7 +21,7 @@ Update the scorecard and experiment log after every run.
 | **010** | **v5 Cowork (LightGBM+RF, 118 features, expanding window)** | **0.63171** | **+0.0656** | **2026-02-25** |
 | **011** | **v6 (+lock_currency, 95 features, LOCK_NAME+CURRENCY FPD rates)** | **0.63408** | **+0.00237** | **2026-02-26** |
 
-**Current best: EXP-011 — Nov AUC 0.63408**
+**Current best (Kaggle): EXP-010 — v5 Nov AUC 0.63171** — Use v5 for submission. v6 (EXP-011) had higher Nov AUC but underperformed v5 on Kaggle; likely overfit to November.
 
 **Kaggle competition slug:** `predicting-fraud-in-phone-financing`
 
@@ -515,6 +515,8 @@ v6 improvement framework implemented per action plan. Target: ~0.62 AUC (from 0.
 ### v6 Results (2026-02-26)
 
 Best config: **+lock_currency** (Nov AUC 0.63343 in experiments; 0.63408 in full run with trend kept).
+
+**Audit:** v6 underperformed v5 on Kaggle. Use v5 for submission. See V7_PROPOSAL.md.
 
 | Config | Nov AUC | Feature count |
 |--------|---------|---------------|

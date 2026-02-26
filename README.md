@@ -26,8 +26,8 @@ Place the following files in the project root (obtain from course materials):
 
 | Script / Notebook | Purpose |
 |-------------------|---------|
-| `_run_v6_cowork.py` | **Current best** — v6 (+lock_currency) → `submission_v6.csv` |
-| `_run_v5_cowork.py` | v5 pipeline — generates `submission_v5.csv` |
+| `_run_v5_cowork.py` | **Current best** — v5 → `submission_v5.csv` (best Kaggle) |
+| `_run_v6_cowork.py` | v6 (+lock_currency) → `submission_v6.csv` (higher Nov AUC, worse Kaggle) |
 | `_run_v6_diagnostics.py` | v6 diagnostics — per-feature temporal AUC, permutation importance |
 | `_run_v6_experiments.py` | v6 config sweep — pruning, LOCK_NAME/CURRENCY, HP, ensemble |
 | `best_model_pipeline.ipynb` | v4 NN pipeline — generates `submission.csv` |
@@ -35,11 +35,13 @@ Place the following files in the project root (obtain from course materials):
 
 ## Current Best
 
-**v6 Cowork** — +lock_currency config: LOCK_NAME + CURRENCY FPD rates, pruned base (no dormancy, PMT_CORE), 95 features.
+**v5 Cowork** — LightGBM + RF ensemble (70/30), 118 features, expanding-window entity rates, payment history features. Best Kaggle performance.
 
-- **November AUC:** 0.63408
-- **Submission:** `submission_v6.csv`
-- **Run:** `python _run_v6_cowork.py`
+- **November AUC:** 0.63171
+- **Submission:** `submission_v5.csv`
+- **Run:** `python _run_v5_cowork.py`
+
+**Note:** v6 had higher Nov AUC (0.63408) but underperformed v5 on Kaggle; see EXPERIMENTS.md and V7_PROPOSAL.md.
 
 See `RESULTS.md` and `EXPERIMENTS.md` for details. Legacy experiment scripts are in `archive/`.
 
