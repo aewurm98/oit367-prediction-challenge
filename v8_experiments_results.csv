@@ -1,0 +1,2 @@
+config_id,nov_auc,feature_count,runtime_sec,ensemble_models,weights,depth,l2_leaf_reg,learning_rate
+lgb_only,0.6147579364153755,92,78.11861610412598,lgb,1.000,6,3.0,0.05

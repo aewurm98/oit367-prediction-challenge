@@ -20,6 +20,7 @@ Update the scorecard and experiment log after every run.
 | **009** | **v2 + ALL new feature groups (A+B+C+D combined)** | **0.5574** | **+0.0018** | **2025-02-23** |
 | **010** | **v5 Cowork (LightGBM+RF, 118 features, expanding window)** | **0.63171** | **+0.0656** | **2026-02-25** |
 | **011** | **v6 (+lock_currency, 95 features, LOCK_NAME+CURRENCY FPD rates)** | **0.63408** | **+0.00237** | **2026-02-26** |
+| 012 | v8 (CatBoost+LGB ensemble, 92 features, market payment stats, expanding FPD rates) | 0.61476 | -0.01932 | 2026-02-25 |
 
 **Current best (Kaggle): EXP-010 — v5 Nov AUC 0.63171** — Use v5 for submission. v6 (EXP-011) had higher Nov AUC but underperformed v5 on Kaggle; likely overfit to November.
 

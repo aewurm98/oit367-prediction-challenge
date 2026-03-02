@@ -217,3 +217,25 @@ dormancy and PMT_CORE disabled (pruned base). Best config from v6 experiments.
 **Run:** `python _run_v6_cowork.py`
 
 **Audit note:** v6 underperformed v5 on Kaggle despite higher Nov AUC. Use v5 for submission. See V7_PROPOSAL.md for lessons learned.
+
+---
+
+## v8 — CatBoost + LightGBM Ensemble (2026-02-25)
+
+**Description:** Standalone v8 pipeline with market payment stats, expanding-window FPD rates (LOCK_NAME, CURRENCY, MANUFACTURER, LOCK_PRODUCT, STATE), country z-scores, state_mismatch, and low-card payment aggregates. Ensemble of CatBoost + LightGBM with scipy-optimized blend weights.
+
+**Features:** 92 (base features, market payment stats, expanding FPD rates, country z-scores, state_mismatch, low-card payment aggregates)
+
+**Ensemble:** CatBoost + LightGBM (weights optimized on Nov val via scipy.optimize)
+
+**Results:**
+
+| Metric | Value |
+|---|---|
+| November held-out AUC | 0.61476 |
+| Ensemble weights | [0.5, 0.5] |
+| Submission mean pred | (98,932 rows) |
+
+**Submission file:** `submission_v8.csv`
+
+**Run:** `python payjoy_model_v8.py`
