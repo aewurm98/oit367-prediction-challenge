@@ -11,12 +11,15 @@ Builds on payjoy_model_clean_v5 and v5 cowork.
 
 Usage:
   python payjoy_model_v8.py
+  python payjoy_model_v8.py --config-id lgb_only
+  python payjoy_model_v8.py --config-id hp_lgb_nl63_mcs50_lr0.05
 
 Output:
   submission_v8.csv
   run_v8.log
 """
 
+import argparse
 import os
 import time
 import warnings
@@ -28,6 +31,7 @@ import pandas as pd
 from lib.log_utils import make_logger
 from lib.submission_utils import validate_submission
 from lib.v8_pipeline import V8Config, build_features, train_and_eval
+from _run_v8_experiments import get_config_by_id
 
 np.random.seed(42)
 
@@ -37,6 +41,31 @@ LOG_FILE = f'run_{VERSION}.log'
 
 t0 = time.time()
 log = make_logger(LOG_FILE, t0)
+
+
+def _parse_args():
+    parser = argparse.ArgumentParser(description='v8 production model for Kaggle submission')
+    parser.add_argument('--config-id', type=str, default=None,
+                        help='Config from experiments (e.g. lgb_only, hp_lgb_nl63_mcs50_lr0.05). Default: v8_production.')
+    return parser.parse_args()
+
+
+def _default_config() -> V8Config:
+    return V8Config(
+        config_id='v8_production',
+        use_expanding_rates=True,
+        use_country_z=True,
+        use_state_mismatch=True,
+        use_market_pay_stats=True,
+        use_payment_aggregates=True,
+        ensemble_models=('cat', 'lgb'),
+        weight_strategy='optimize',
+        include_rf=False,
+    )
+
+
+args = _parse_args()
+config = get_config_by_id(args.config_id) if args.config_id else _default_config()
 
 log("Loading data...")
 orders = pd.read_csv('Orders.csv', low_memory=False)
@@ -56,18 +85,7 @@ for alt, canonical in _PMT_ALIASES.items():
         payments = payments.rename(columns={alt: canonical})
 
 log(f"Orders: {orders.shape[0]:,}  Payments: {payments.shape[0]:,}  Test: {len(test_ids):,}")
-
-config = V8Config(
-    config_id='v8_production',
-    use_expanding_rates=True,
-    use_country_z=True,
-    use_state_mismatch=True,
-    use_market_pay_stats=True,
-    use_payment_aggregates=True,
-    ensemble_models=('cat', 'lgb'),
-    weight_strategy='optimize',
-    include_rf=False,
-)
+log(f"Config: {config.config_id}")
 
 log("Building features...")
 train_df, test_df, feature_cols, global_rate = build_features(orders, payments, test_ids, config, log=log)

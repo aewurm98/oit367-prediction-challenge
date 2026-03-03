@@ -5,6 +5,7 @@ Builds on payjoy_model_clean_v5 and v5 cowork patterns.
 
 from __future__ import annotations
 
+import os
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -85,6 +86,11 @@ class V8Config:
     def feature_signature(self) -> str:
         """Hash for feature caching (excludes HP)."""
         return f"exp{self.use_expanding_rates}_cz{self.use_country_z}_sm{self.use_state_mismatch}_mp{self.use_market_pay_stats}_pa{self.use_payment_aggregates}"
+
+
+def _use_gpu() -> bool:
+    """Use GPU for CatBoost/LightGBM/XGBoost when V8_USE_GPU=1 (e.g. on Modal with GPU)."""
+    return os.environ.get("V8_USE_GPU", "0") in ("1", "true", "yes")
 
 
 K_SMOOTH = 10
@@ -194,12 +200,15 @@ def build_features(
         ).astype(float)
 
     if config.use_country_z and 'COUNTRY' in orders.columns:
-        eps = 1e-6
+        train_only = orders[orders['FINANCEORDERID'].isin(train_ids)]
         for col in ['FINANCE_AMOUNT', 'PURCHASE_AMOUNT', 'TOTAL_DUE', 'DOWN_PAYMENT_AMOUNT']:
             if col in orders.columns:
-                mu = orders.groupby('COUNTRY')[col].transform('mean')
-                sig = orders.groupby('COUNTRY')[col].transform('std').replace(0, 1)
-                orders[f'{col}_z'] = (orders[col] - mu) / sig
+                stats = train_only.groupby('COUNTRY')[col].agg(['mean', 'std']).reset_index()
+                stats.columns = ['COUNTRY', f'{col}_mu', f'{col}_sig']
+                stats[f'{col}_sig'] = stats[f'{col}_sig'].replace(0, 1)
+                orders = orders.merge(stats, on='COUNTRY', how='left')
+                orders[f'{col}_z'] = ((orders[col] - orders[f'{col}_mu']) / orders[f'{col}_sig']).fillna(0)
+                orders = orders.drop(columns=[f'{col}_mu', f'{col}_sig'])
 
     if config.use_market_pay_stats and numeric_pay:
         ord_cols = ['FINANCEORDERID', 'COUNTRY', 'MANUFACTURER', 'MERCHANT_STATE']
@@ -334,17 +343,19 @@ def train_model(
         _depth = config.cat_depth if config.cat_depth is not None else config.depth
         _l2 = config.cat_l2_leaf_reg if config.cat_l2_leaf_reg is not None else config.l2_leaf_reg
         _lr = config.cat_learning_rate if config.cat_learning_rate is not None else config.learning_rate
+        # CatBoost: AUC is not implemented for GPU; use Logloss for GPU training
+        _eval_metric = 'Logloss' if _use_gpu() else 'AUC'
         model = CatBoost(
             iterations=config.iterations,
             learning_rate=_lr,
             depth=_depth,
             l2_leaf_reg=_l2,
             scale_pos_weight=scale_pos_weight,
-            eval_metric='AUC',
+            eval_metric=_eval_metric,
             early_stopping_rounds=config.early_stopping_rounds,
             random_seed=config.random_state,
             verbose=0,
-            task_type='CPU',
+            task_type='GPU' if _use_gpu() else 'CPU',
         )
         model.fit(X_tr, y_tr, eval_set=(X_val, y_val), use_best_model=True)
         val_pred = model.predict_proba(X_val)[:, 1]
@@ -368,6 +379,8 @@ def train_model(
             'reg_alpha': 0.1, 'reg_lambda': 0.1,
             'scale_pos_weight': scale_pos_weight,
             'verbose': -1, 'n_jobs': -1, 'random_state': config.random_state,
+            # LightGBM uses OpenCL for GPU; Modal's T4 image has CUDA but not OpenCL, so use CPU when V8_USE_GPU=1
+            'device': 'cpu',
         }
         dtrain = lgb.Dataset(X_tr, label=y_tr)
         dval = lgb.Dataset(X_val, label=y_val, reference=dtrain)
@@ -394,6 +407,8 @@ def train_model(
             eval_metric='auc',
             early_stopping_rounds=config.early_stopping_rounds,
             random_state=config.random_state,
+            tree_method='hist',
+            device='cuda' if _use_gpu() else 'cpu',
         )
         model.fit(X_tr, y_tr, eval_set=[(X_val, y_val)], verbose=False)
         val_pred = model.predict_proba(X_val)[:, 1]

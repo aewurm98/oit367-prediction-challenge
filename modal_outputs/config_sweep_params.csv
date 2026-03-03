@@ -1,0 +1,15 @@
+config_id,cat_depth,cat_l2_leaf_reg,cat_learning_rate,cat_iterations,cat_early_stopping,lgb_num_leaves,lgb_min_child_samples,lgb_learning_rate,lgb_iterations,lgb_early_stopping,xgb_max_depth,xgb_learning_rate,xgb_iterations,xgb_early_stopping,rf_n_estimators,rf_max_depth,rf_min_samples_leaf,weight_strategy,ensemble_models
+cat_only,6,3.0,0.05,1000,50,63,50,0.05,1000,50,6,0.05,1000,50,200,12,50,optimize,cat
+lgb_only,6,3.0,0.05,1000,50,63,50,0.05,1000,50,6,0.05,1000,50,200,12,50,optimize,lgb
+xgb_only,6,3.0,0.05,1000,50,63,50,0.05,1000,50,6,0.05,1000,50,200,12,50,optimize,xgb
+ensemble_cat_lgb,6,3.0,0.05,1000,50,63,50,0.05,1000,50,6,0.05,1000,50,200,12,50,optimize,"cat,lgb"
+ensemble_cat_lgb_xgb,6,3.0,0.05,1000,50,63,50,0.05,1000,50,6,0.05,1000,50,200,12,50,optimize,"cat,lgb,xgb"
+ensemble_cat_lgb_rf,6,3.0,0.05,1000,50,63,50,0.05,1000,50,6,0.05,1000,50,200,12,50,optimize,"cat,lgb"
+no_expanding_rates,6,3.0,0.05,1000,50,63,50,0.05,1000,50,6,0.05,1000,50,200,12,50,optimize,"cat,lgb"
+no_country_z,6,3.0,0.05,1000,50,63,50,0.05,1000,50,6,0.05,1000,50,200,12,50,optimize,"cat,lgb"
+no_payment_aggregates,6,3.0,0.05,1000,50,63,50,0.05,1000,50,6,0.05,1000,50,200,12,50,optimize,"cat,lgb"
+cat_depth5,5,3.0,0.05,1000,50,31,50,0.05,1000,50,5,0.05,1000,50,200,12,50,optimize,"cat,lgb"
+cat_depth7,7,3.0,0.05,1000,50,127,50,0.05,1000,50,7,0.05,1000,50,200,12,50,optimize,"cat,lgb"
+cat_l2_5,6,5.0,0.05,1000,50,63,50,0.05,1000,50,6,0.05,1000,50,200,12,50,optimize,"cat,lgb"
+cat_lr_03,6,3.0,0.03,1000,50,63,50,0.03,1000,50,6,0.03,1000,50,200,12,50,optimize,"cat,lgb"
+ensemble_cat_lgb_equal,6,3.0,0.05,1000,50,63,50,0.05,1000,50,6,0.05,1000,50,200,12,50,equal,"cat,lgb"

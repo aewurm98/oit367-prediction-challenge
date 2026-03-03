@@ -30,6 +30,7 @@ Place the following files in the project root (obtain from course materials):
 | `_run_v6_cowork.py` | v6 (+lock_currency) → `submission_v6.csv` (higher Nov AUC, worse Kaggle) |
 | `payjoy_model_v8.py` | v8 pipeline → `submission_v8.csv` (CatBoost+LGB ensemble, 92 features) |
 | `_run_v8_experiments.py` | v8 config sweep — single models, ensembles, feature ablations |
+| `modal_v8.py` | v8 on Modal (GPU T4) — run experiments or production remotely, download logs + CSVs. See docstring for prescriptive setup (local vs Modal). |
 | `_run_v6_diagnostics.py` | v6 diagnostics — per-feature temporal AUC, permutation importance |
 | `_run_v6_experiments.py` | v6 config sweep — pruning, LOCK_NAME/CURRENCY, HP, ensemble |
 | `best_model_pipeline.ipynb` | v4 NN pipeline — generates `submission.csv` |
