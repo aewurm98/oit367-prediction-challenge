@@ -26,25 +26,30 @@ Place the following files in the project root (obtain from course materials):
 
 | Script / Notebook | Purpose |
 |-------------------|---------|
-| `_run_v5_cowork.py` | **Current best** — v5 → `submission_v5.csv` (best Kaggle) |
-| `_run_v6_cowork.py` | v6 (+lock_currency) → `submission_v6.csv` (higher Nov AUC, worse Kaggle) |
 | `payjoy_model_v8.py` | v8 pipeline → `submission_v8.csv` (CatBoost+LGB ensemble, 92 features) |
+| `v5_gpu_turbo.py` | v5 GPU variant → `submission_v5_gpu_turbo.csv` (CatBoost+LGB+XGB, expanding-window rates) |
 | `_run_v8_experiments.py` | v8 config sweep — single models, ensembles, feature ablations |
-| `modal_v8.py` | v8 on Modal (GPU T4) — run experiments or production remotely, download logs + CSVs. See docstring for prescriptive setup (local vs Modal). |
-| `_run_v6_diagnostics.py` | v6 diagnostics — per-feature temporal AUC, permutation importance |
-| `_run_v6_experiments.py` | v6 config sweep — pruning, LOCK_NAME/CURRENCY, HP, ensemble |
+| `modal_v8.py` | v8 on Modal (GPU T4) — run experiments or production remotely, download logs + CSVs |
 | `best_model_pipeline.ipynb` | v4 NN pipeline — generates `submission.csv` |
-| `model_experiments.ipynb` | Experimentation — model comparison, hyperparameter tuning |
+| `model_experiments_run.py` | Experimentation — XGBoost, LightGBM, NN, ensemble (v1–v3 style) |
+| `ensemble_submissions.py` | Blend v8 + v5_gpu_turbo predictions → `submission_ensemble.csv` |
+
+**Note:** The v5 Cowork script (`_run_v5_cowork.py`) and v6 script (`_run_v6_cowork.py`) referenced in RESULTS.md are not in this repo. `v5_gpu_turbo.py` is the closest v5 variant available.
 
 ## Current Best
 
 **v5 Cowork** — LightGBM + RF ensemble (70/30), 118 features, expanding-window entity rates, payment history features. Best Kaggle performance.
 
 - **November AUC:** 0.63171
-- **Submission:** `submission_v5.csv`
-- **Run:** `python _run_v5_cowork.py`
+- **Submission:** `submission_v5.csv` (produced by cowork pipeline; use for Kaggle)
+- **Closest reproducible:** `v5_gpu_turbo.py` → `submission_v5_gpu_turbo.csv`
 
 **Note:** v6 had higher Nov AUC (0.63408) but underperformed v5 on Kaggle; see EXPERIMENTS.md and V7_PROPOSAL.md.
+
+## Repository Layout
+
+- **Submissions:** `submission_v5.csv` (best), `submission_v6.csv`, `submission_v8.csv`, etc. — see [outputs/README.md](outputs/README.md)
+- **Report summary:** [REPORT_SUMMARY.md](REPORT_SUMMARY.md) — structured summary for the final report
 
 See `RESULTS.md` and `EXPERIMENTS.md` for details. Legacy experiment scripts are in `archive/`.
 
