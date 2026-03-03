@@ -26,6 +26,7 @@ Place the following files in the project root (obtain from course materials):
 
 | Script / Notebook | Purpose |
 |-------------------|---------|
+| `payjoy_model_v9.py` | **v9 clean build** — v5 entity rates + PMT_CORE + v8 Cat+LGB (cat_lr_03) → `submission_v9.csv` |
 | `payjoy_model_v8.py` | v8 pipeline → `submission_v8.csv` (CatBoost+LGB ensemble, 92 features) |
 | `v5_gpu_turbo.py` | v5 GPU variant → `submission_v5_gpu_turbo.csv` (CatBoost+LGB+XGB, expanding-window rates) |
 | `_run_v8_experiments.py` | v8 config sweep — single models, ensembles, feature ablations |

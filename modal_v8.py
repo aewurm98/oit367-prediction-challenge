@@ -34,6 +34,9 @@ PRESCRIPTIVE SETUP
    # v5 GPU turbo (CatBoost + LightGBM + XGBoost ensemble)
    modal run modal_v8.py --mode v5_turbo --output-suffix v5_turbo
 
+   # v9 clean build (v5 entity rates + PMT_CORE + v8 Cat+LGB)
+   modal run modal_v8.py --mode v9 --output-suffix v9
+
    # Download results
    modal volume get payjoy-v8-data output/v8_experiments_results.csv ./v8_experiments_results.csv
 
@@ -90,6 +93,8 @@ image = (
         "lightgbm==4.6.0",
         "catboost>=1.2",
         "scipy>=1.10",
+        "matplotlib",
+        "seaborn",
     )
     .add_local_dir(
         PROJECT_ROOT,
@@ -214,6 +219,48 @@ def run_v5_turbo(output_suffix: str | None = "v5_turbo") -> dict:
     return {"exit_code": code, "output_dir": output_dir}
 
 
+@app.function(
+    image=image,
+    volumes={DATA_MOUNT: volume},
+    gpu="T4",
+    timeout=1800,  # 30 min for v9 single run
+    memory=8192,
+    retries=1,
+    env={"V9_USE_GPU": "1", "V8_USE_GPU": "1", "V5_LGB_USE_CPU": "1"},
+)
+def run_v9(output_suffix: str | None = "v9") -> dict:
+    """Run payjoy_model_v9.py (v5 entity rates + PMT_CORE + v8 Cat+LGB) on GPU."""
+    output_dir = _output_dir(output_suffix)
+    cmd = [sys.executable, "payjoy_model_v9.py"]
+    code = _setup_workspace_and_run(
+        cmd,
+        ["submission_v9.csv", "run_v9.log"],
+        output_dir,
+    )
+    return {"exit_code": code, "output_dir": output_dir}
+
+
+@app.function(
+    image=image,
+    volumes={DATA_MOUNT: volume},
+    gpu="T4",
+    timeout=1800,
+    memory=8192,
+    retries=1,
+    env={"VIVIAN_DATA_PATH": ".", "V8_USE_GPU": "1", "V5_LGB_USE_CPU": "1"},
+)
+def run_vivian(output_suffix: str | None = "vivian") -> dict:
+    """Run vivian_final_model.py on GPU."""
+    output_dir = _output_dir(output_suffix)
+    cmd = [sys.executable, "vivian_final_model.py"]
+    code = _setup_workspace_and_run(
+        cmd,
+        ["submission_v5_mismatch.csv", "improved_submission.csv"],
+        output_dir,
+    )
+    return {"exit_code": code, "output_dir": output_dir}
+
+
 @app.local_entrypoint()
 def main(
     mode: str = "experiments",
@@ -230,6 +277,10 @@ def main(
             run_production.remote(output_suffix=output_suffix, config_id=config_id)
         elif mode == "v5_turbo":
             run_v5_turbo.remote(output_suffix=output_suffix or "v5_turbo")
+        elif mode == "v9":
+            run_v9.remote(output_suffix=output_suffix or "v9")
+        elif mode == "vivian":
+            run_vivian.remote(output_suffix=output_suffix or "vivian")
         else:
             run_experiments.remote(
                 grid_search=grid_search,
@@ -238,13 +289,22 @@ def main(
                 config_range=config_range,
                 output_suffix=output_suffix,
             )
-    out = f"output_{output_suffix}" if output_suffix else ("output_v5_turbo" if mode == "v5_turbo" else "output")
+    out = f"output_{output_suffix}" if output_suffix else (
+        "output_v5_turbo" if mode == "v5_turbo" else "output_v9" if mode == "v9"
+        else "output_vivian" if mode == "vivian" else "output"
+    )
     print(f"\nDone. Download outputs with:")
     if mode == "production":
         print(f"  modal volume get payjoy-v8-data {out}/submission_v8.csv ./submission_v8.csv")
         print(f"  modal volume get payjoy-v8-data {out}/run_v8.log ./run_v8.log")
     elif mode == "v5_turbo":
         print(f"  modal volume get payjoy-v8-data {out}/submission_v5_gpu_turbo.csv ./submission_v5_gpu_turbo.csv")
+    elif mode == "v9":
+        print(f"  modal volume get payjoy-v8-data {out}/submission_v9.csv ./submission_v9.csv")
+        print(f"  modal volume get payjoy-v8-data {out}/run_v9.log ./run_v9.log")
+    elif mode == "vivian":
+        print(f"  modal volume get payjoy-v8-data {out}/submission_v5_mismatch.csv ./submission_vivian.csv")
+        print(f"  modal volume get payjoy-v8-data {out}/improved_submission.csv ./improved_submission_vivian.csv")
     else:
         print(f"  modal volume get payjoy-v8-data {out}/v8_experiments_results.csv ./v8_experiments_results.csv")
         print(f"  modal volume get payjoy-v8-data {out}/v8_experiments_params.csv ./v8_experiments_params.csv")

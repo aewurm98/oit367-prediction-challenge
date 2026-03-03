@@ -239,3 +239,25 @@ dormancy and PMT_CORE disabled (pruned base). Best config from v6 experiments.
 **Submission file:** `submission_v8.csv`
 
 **Run:** `python payjoy_model_v8.py`
+
+---
+
+## v9 — Clean Build (v5 + v8 Best Blend) (2026-03-02)
+
+**Description:** Single clean pipeline combining v5's entity FPD rates (MERCHANTID, CLERK_ID, ADMINID, STATE, CITY, MODEL) and PMT_CORE (pmt_fpd_proxy_rate, zero_recovery_rate) with v8's Cat+LGB ensemble and cat_lr_03 hyperparameters. Excludes LOCK_NAME/CURRENCY FPD rates (v6 overfit), dormancy, and full PMT_RICH.
+
+**Features:** ~81–95 (entity FPD rates, PMT_CORE, country z-scores, state_mismatch, market payment stats, MANUFACTURER/LOCK_PRODUCT market FPD rates)
+
+**Ensemble:** CatBoost + LightGBM (cat_lr_03: lr=0.03, depth=6, l2=3.0; LGB defaults)
+
+**Results:** (run to populate)
+
+| Metric | Value |
+|---|---|
+| November held-out AUC | TBD |
+| Ensemble weights | TBD |
+| Submission mean pred | TBD |
+
+**Submission file:** `submission_v9.csv`
+
+**Run:** `python payjoy_model_v9.py`

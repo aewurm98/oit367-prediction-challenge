@@ -1,0 +1,10 @@
+config_id,cat_depth,cat_l2_leaf_reg,cat_learning_rate,cat_iterations,cat_early_stopping,lgb_num_leaves,lgb_min_child_samples,lgb_learning_rate,lgb_iterations,lgb_early_stopping,xgb_max_depth,xgb_learning_rate,xgb_iterations,xgb_early_stopping,rf_n_estimators,rf_max_depth,rf_min_samples_leaf,weight_strategy,ensemble_models
+hp_lgb_nl31_mcs30_lr0.03,6,3.0,0.05,1000,50,31,30,0.03,1000,50,6,0.05,1000,50,200,12,50,optimize,lgb
+hp_lgb_nl63_mcs30_lr0.03,6,3.0,0.05,1000,50,63,30,0.03,1000,50,6,0.05,1000,50,200,12,50,optimize,lgb
+hp_lgb_nl127_mcs30_lr0.03,6,3.0,0.05,1000,50,127,30,0.03,1000,50,6,0.05,1000,50,200,12,50,optimize,lgb
+hp_lgb_nl31_mcs50_lr0.03,6,3.0,0.05,1000,50,31,50,0.03,1000,50,6,0.05,1000,50,200,12,50,optimize,lgb
+hp_lgb_nl63_mcs50_lr0.03,6,3.0,0.05,1000,50,63,50,0.03,1000,50,6,0.05,1000,50,200,12,50,optimize,lgb
+hp_lgb_nl127_mcs50_lr0.03,6,3.0,0.05,1000,50,127,50,0.03,1000,50,6,0.05,1000,50,200,12,50,optimize,lgb
+hp_lgb_nl31_mcs100_lr0.03,6,3.0,0.05,1000,50,31,100,0.03,1000,50,6,0.05,1000,50,200,12,50,optimize,lgb
+hp_lgb_nl63_mcs100_lr0.03,6,3.0,0.05,1000,50,63,100,0.03,1000,50,6,0.05,1000,50,200,12,50,optimize,lgb
+hp_lgb_nl127_mcs100_lr0.03,6,3.0,0.05,1000,50,127,100,0.03,1000,50,6,0.05,1000,50,200,12,50,optimize,lgb
